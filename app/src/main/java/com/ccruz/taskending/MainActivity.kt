@@ -130,20 +130,15 @@ fun RegistrationScreen(
         )
         Button(
             onClick = {
-                val trimmedUsername = username.trim()
-                val isUsernameEmpty = trimmedUsername.isEmpty()
-                val isPasswordEmpty = password.isEmpty()
-                val isPasswordTooShort = !isPasswordEmpty && password.length < 6
+                val validationResult = validateCredentials(
+                    username = username,
+                    password = password
+                )
 
-                usernameError = if (isUsernameEmpty) "Username is required" else null
-                passwordError = when {
-                    isPasswordEmpty -> "Password is required"
-                    isPasswordTooShort -> "Password must be at least 6 characters"
-                    else -> null
-                }
+                usernameError = validationResult.usernameError
+                passwordError = validationResult.passwordError
 
-                val isValid = !isUsernameEmpty && !isPasswordEmpty && !isPasswordTooShort
-                if (isValid) {
+                if (validationResult.isValid) {
                     onSubmitSuccess()
                 }
             },
