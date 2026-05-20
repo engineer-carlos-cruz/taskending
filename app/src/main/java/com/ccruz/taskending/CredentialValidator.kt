@@ -11,13 +11,16 @@ data class CredentialValidationResult(
 fun validateCredentials(username: String, password: String): CredentialValidationResult {
     val trimmedUsername = username.trim()
     val isUsernameEmpty = trimmedUsername.isEmpty()
+    val isUsernameFormatInvalid = !isUsernameEmpty && !isValidUsernameOrEmail(trimmedUsername)
     val isPasswordEmpty = password.isEmpty()
-    val isPasswordTooShort = !isPasswordEmpty && password.length < 6
 
-    val usernameError = if (isUsernameEmpty) "Username is required" else null
+    val usernameError = when {
+        isUsernameEmpty -> "Username or email is required"
+        isUsernameFormatInvalid -> "Enter a valid username or email"
+        else -> null
+    }
     val passwordError = when {
         isPasswordEmpty -> "Password is required"
-        isPasswordTooShort -> "Password must be at least 6 characters"
         else -> null
     }
 
@@ -25,4 +28,10 @@ fun validateCredentials(username: String, password: String): CredentialValidatio
         usernameError = usernameError,
         passwordError = passwordError
     )
+}
+
+private fun isValidUsernameOrEmail(value: String): Boolean {
+    val usernamePattern = Regex("^[A-Za-z0-9_]{3,30}$")
+    val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    return usernamePattern.matches(value) || emailPattern.matches(value)
 }
